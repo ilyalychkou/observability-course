@@ -17,6 +17,9 @@ scrape_configs:
 # Для дополнительного задания нужно настроить recording rules.
 # Не листайте вниз к решению, пока не настроите сбор самостоятельно.
 
+remote_write:
+  - url: "http://victoria:8428/api/v1/write"
+
 
 
 
