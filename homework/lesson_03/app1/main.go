@@ -23,7 +23,7 @@ var (
 	httpRequestsLatency = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "http_requests_latency_seconds",
 		Help:    "HTTP request latency in seconds.",
-		Buckets: []float64{0.1, 0.5, 1, 2, 7, 12, 20, 30},
+		Buckets: []float64{0.1, 0.25, 0.5, 0.75, 1},
 	}, []string{"method", "path", "status"})
 )
 
