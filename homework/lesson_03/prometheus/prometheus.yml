@@ -1,6 +1,6 @@
 global:
-  scrape_interval: 3s
-  scrape_timeout: 3s
+  scrape_interval: 30s
+  scrape_timeout: 5s
   external_labels:
     datacenter: home-123
 
@@ -21,13 +21,6 @@ scrape_configs:
 
 remote_write:
   - url: "http://victoria:8428/api/v1/write"
-
-
-
-
-
-
-
 
 
 

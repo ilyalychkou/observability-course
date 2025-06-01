@@ -54,14 +54,22 @@ func middleware(next http.Handler) http.Handler {
 
 		duration := time.Since(start)
 		statusCode := strconv.Itoa(ww.statusCode)
+		route := mux.CurrentRoute(r)
+
+		pathTemplate := "unknown"
+		if route != nil {
+			if pt, err := route.GetPathTemplate(); err == nil {
+				pathTemplate = pt
+			}
+		}
 
 		// Hint: need to replace r.URL.Path with parameterized Path to avoid cardinality explosion
 		httpRequestsTotal.With(
-			prometheus.Labels{"method": r.Method, "path": r.URL.Path, "status": statusCode},
+			prometheus.Labels{"method": r.Method, "path": pathTemplate, "status": statusCode},
 		).Inc()
 
 		httpRequestsLatency.With(
-			prometheus.Labels{"method": r.Method, "path": r.URL.Path, "status": statusCode}).
+			prometheus.Labels{"method": r.Method, "path": pathTemplate, "status": statusCode}).
 			Observe(duration.Seconds())
 	})
 }
