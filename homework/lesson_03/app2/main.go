@@ -21,10 +21,9 @@ var (
 	}, []string{"method", "path", "status"})
 
 	httpRequestsLatency = promauto.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "http_requests_latency_seconds",
-		Help: "HTTP request latency in seconds.",
-		// Hint: too many buckets
-		Buckets: prometheus.ExponentialBuckets(0.01, 2, 500),
+		Name:    "http_requests_latency_seconds",
+		Help:    "HTTP request latency in seconds.",
+		Buckets: []float64{0.1, 0.5, 1, 2, 7, 12, 20, 30},
 	}, []string{"method", "path", "status"})
 )
 
