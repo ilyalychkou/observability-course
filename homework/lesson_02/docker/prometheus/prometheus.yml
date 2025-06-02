@@ -6,8 +6,15 @@
 
 
 
+global:
+  scrape_interval: 15s
 
-
+scrape_configs:
+  - job_name: 'product_catalog_app'
+    static_configs:
+      - targets:
+          - 'product-catalog-replica-1:8080'
+          - 'product-catalog-replica-2:8080'
 
 
 
