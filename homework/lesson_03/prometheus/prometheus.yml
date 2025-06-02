@@ -18,6 +18,8 @@ scrape_configs:
 # Здесь нужно настроить remote_write.
 # Для дополнительного задания нужно настроить recording rules.
 # Не листайте вниз к решению, пока не настроите сбор самостоятельно.
+rule_files:
+  - "rules.yml"
 
 remote_write:
   - url: "http://victoria:8428/api/v1/write"

@@ -6,7 +6,7 @@ export const options = {
         constant_rps: {
             executor: 'constant-arrival-rate',
             duration: '10m',
-            rate: 100,
+            rate: 50,
             gracefulStop: '0s',
             preAllocatedVUs: 100,
         },

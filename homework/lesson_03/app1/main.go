@@ -63,7 +63,6 @@ func middleware(next http.Handler) http.Handler {
 			}
 		}
 
-		// Hint: need to replace r.URL.Path with parameterized Path to avoid cardinality explosion
 		httpRequestsTotal.With(
 			prometheus.Labels{"method": r.Method, "path": pathTemplate, "status": statusCode},
 		).Inc()
