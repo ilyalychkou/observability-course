@@ -37,7 +37,7 @@ services:
 
   victoria:
     container_name: victoria
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.118.0
     ports:
       - "8428:8428"
     command:

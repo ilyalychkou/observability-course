@@ -23,7 +23,7 @@ var (
 	httpRequestsLatency = promauto.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "http_requests_latency_seconds",
 		Help:    "HTTP request latency in seconds.",
-		Buckets: []float64{0.1, 0.5, 1, 2, 7, 12, 20, 30},
+		Buckets: []float64{0.1, 0.25, 0.5, 0.75, 1},
 	}, []string{"method", "path", "status"})
 )
 
@@ -54,14 +54,21 @@ func middleware(next http.Handler) http.Handler {
 
 		duration := time.Since(start)
 		statusCode := strconv.Itoa(ww.statusCode)
+		route := mux.CurrentRoute(r)
 
-		// Hint: need to replace r.URL.Path with parameterized Path to avoid cardinality explosion
+		pathTemplate := "unknown"
+		if route != nil {
+			if pt, err := route.GetPathTemplate(); err == nil {
+				pathTemplate = pt
+			}
+		}
+
 		httpRequestsTotal.With(
-			prometheus.Labels{"method": r.Method, "path": r.URL.Path, "status": statusCode},
+			prometheus.Labels{"method": r.Method, "path": pathTemplate, "status": statusCode},
 		).Inc()
 
 		httpRequestsLatency.With(
-			prometheus.Labels{"method": r.Method, "path": r.URL.Path, "status": statusCode}).
+			prometheus.Labels{"method": r.Method, "path": pathTemplate, "status": statusCode}).
 			Observe(duration.Seconds())
 	})
 }

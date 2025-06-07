@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -21,10 +22,9 @@ var (
 	}, []string{"method", "path", "status"})
 
 	httpRequestsLatency = promauto.NewHistogramVec(prometheus.HistogramOpts{
-		Name: "http_requests_latency_seconds",
-		Help: "HTTP request latency in seconds.",
-		// Hint: too many buckets
-		Buckets: prometheus.ExponentialBuckets(0.01, 2, 500),
+		Name:    "http_requests_latency_seconds",
+		Help:    "HTTP request latency in seconds.",
+		Buckets: []float64{0.1, 0.25, 0.5, 0.75, 1},
 	}, []string{"method", "path", "status"})
 )
 
@@ -83,14 +83,28 @@ func (ww *responseWriter) WriteHeader(statusCode int) {
 
 type Collector struct {
 	heavyMetric *prometheus.Desc
+	cache       float64
+	mu          sync.RWMutex
 }
 
 func newCollector() *Collector {
-	return &Collector{
+	c := &Collector{
 		heavyMetric: prometheus.NewDesc("my_heavy_metric",
-			"Takes long to calculate",
+			"Heavy metric calculated periodically in background",
 			nil, nil,
 		),
+	}
+	go c.backgroundUpdater()
+	return c
+}
+
+func (c *Collector) backgroundUpdater() {
+	for {
+		value := calculateHeavyMetric()
+		c.mu.Lock()
+		c.cache = value
+		c.mu.Unlock()
+		time.Sleep(5 * time.Second)
 	}
 }
 
@@ -98,12 +112,17 @@ func (collector *Collector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- collector.heavyMetric
 }
 
-func (collector *Collector) Collect(ch chan<- prometheus.Metric) {
-	log.Println("Running collection")
-	ch <- prometheus.MustNewConstMetric(collector.heavyMetric, prometheus.GaugeValue, calculateHeavyMetric())
+func (c *Collector) Collect(ch chan<- prometheus.Metric) {
+	log.Println("Running my_heavy_metric ollection")
+	c.mu.RLock()
+	value := c.cache
+	c.mu.RUnlock()
+
+	ch <- prometheus.MustNewConstMetric(c.heavyMetric, prometheus.GaugeValue, value)
 }
 
 func calculateHeavyMetric() float64 {
-	time.Sleep(time.Second * time.Duration(rand.Intn(5)+1))
-	return rand.Float64()
+	log.Println("Recalculating my_heavy_metric in background...")
+	time.Sleep(time.Second * time.Duration(rand.Intn(5)+1)) // simulate slow logic
+	return rand.Float64() * 100
 }
