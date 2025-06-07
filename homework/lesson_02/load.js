@@ -19,8 +19,12 @@ export const options = {
 
 export default function () {
     const id = Math.floor(Math.random() * 3) + 1; // We have products 1, 2, 3
-    const res1 = http.get(`http://localhost:8080/products/${id}`);
-    const res2 = http.get(`http://localhost:8081/products/${id}`);
+
+    const url1 = `http://localhost:8080/products/${id}`;
+    const url2 = `http://localhost:8081/products/${id}`;
+
+    const res1 = http.get(url1);
+    const res2 = http.get(url2);
     check(res1, {
         'is status 200': (r) => r.status === 200,
         'response time is acceptable': (r) => r.timings.duration < 500,
