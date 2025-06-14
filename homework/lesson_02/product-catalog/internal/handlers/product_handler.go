@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
 	"product-catalog/internal/repository"
+
+	"github.com/gorilla/mux"
 )
 
 type ProductHandler struct {
@@ -45,7 +46,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	// Simulate a random error due to memory issues for example
 	// 0.5% chance
 	if shouldFail && rand.Intn(200) == 0 {
-		allocateRandomMemory(1024 * 1500)
+		// allocateRandomMemory(1024 * 1500)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -68,13 +69,13 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func allocateRandomMemory(size int) []byte {
-	data := make([]byte, size)
+// func allocateRandomMemory(size int) []byte {
+// 	data := make([]byte, size)
 
-	rand.Seed(time.Now().UnixNano())
-	for i := range data {
-		data[i] = byte(rand.Intn(256))
-	}
+// 	rand.Seed(time.Now().UnixNano())
+// 	for i := range data {
+// 		data[i] = byte(rand.Intn(256))
+// 	}
 
-	return data
-}
+// 	return data
+// }
