@@ -10,15 +10,34 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 processors:
-  # Здесь стоит что-то добавить
+  batch:
+  attributes/env:
+    actions:
+      - key: environment
+        value: development
+        action: insert
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 4000
+    spike_limit_mib: 500
 
 exporters:
-  # Здесь нужно настроить экспорт в loki
-
+  # Здесь нужно настроить экспорт в loki  
+  otlphttp/loki:
+        endpoint: "http://loki:3100/otlp"
+  
 # Здесь нужно настроить pipelines доставки логов
 # Без правильной настройки collector не запустится
 service:
+  telemetry:
+    logs:
+      level: "debug"
   pipelines:
+    logs/loki:
+      receivers: [otlp]
+      processors: [batch, attributes/env]
+      exporters: [otlphttp/loki]
+
 
 
 

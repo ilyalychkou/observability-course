@@ -9,7 +9,8 @@ services:
     depends_on:
       - otel-collector
     environment:
-      HOMEWORK: somevalue    # Здесь надо настроить правильные otel переменные
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_SERVICE_NAME=homework-service
 
   otel-collector:
     container_name: otel-collector
@@ -54,6 +55,12 @@ services:
     command: -config.file=/etc/promtail/config.yaml
     depends_on:
       - loki
+
+
+
+
+
+
 
 # Sample solution below
 
