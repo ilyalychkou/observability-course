@@ -4,16 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	slogmulti "github.com/samber/slog-multi"
-	"go.opentelemetry.io/contrib/bridges/otelslog"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
-	_ "go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
-	"go.opentelemetry.io/otel/log/global"
-	"go.opentelemetry.io/otel/sdk/log"
-	"go.opentelemetry.io/otel/sdk/resource"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"log/slog"
 	"math/rand"
 	"net/http"
@@ -21,6 +11,17 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	slogmulti "github.com/samber/slog-multi"
+	"go.opentelemetry.io/contrib/bridges/otelslog"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc"
+	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
+	"go.opentelemetry.io/otel/log/global"
+	"go.opentelemetry.io/otel/sdk/log"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -117,10 +118,10 @@ func setupLogger(ctx context.Context) func() {
 	}
 
 	// Uncomment to see otel logs in console
-	// consoleExporter, err := stdoutlog.New(stdoutlog.WithPrettyPrint())
-	// if err != nil {
-	// 	panic(err)
-	// }
+	consoleExporter, err := stdoutlog.New(stdoutlog.WithPrettyPrint())
+	if err != nil {
+		panic(err)
+	}
 
 	lp := log.NewLoggerProvider(
 		log.WithResource(r),
@@ -130,7 +131,7 @@ func setupLogger(ctx context.Context) func() {
 			),
 		),
 		//  Uncomment to see otel logs in console
-		// log.WithProcessor(log.NewSimpleProcessor(consoleExporter)),
+		log.WithProcessor(log.NewSimpleProcessor(consoleExporter)),
 	)
 
 	// Set the logger provider globally
